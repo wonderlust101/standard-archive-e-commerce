@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-if (process.env.MONGO_URI)
+if (!process.env.MONGO_URI)
     throw new Error("MONGO_URI is not defined");
 
 export const connectDB = async () => {
