@@ -1,6 +1,6 @@
-import mongoose, { HydratedDocument, InferSchemaType } from "mongoose";
+import mongoose, { HydratedDocument, InferSchemaType, Schema } from "mongoose";
 
-const userModel = new mongoose.Schema({
+const userModel = new Schema({
         name : {
             type : String,
             required : true
@@ -19,7 +19,7 @@ const userModel = new mongoose.Schema({
         cart : [
             {
                 productId : {
-                    type : mongoose.Schema.Types.ObjectId,
+                    type : Schema.Types.ObjectId,
                     ref : "Product"
                 },
                 quantity : {
