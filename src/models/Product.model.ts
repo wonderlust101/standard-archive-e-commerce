@@ -54,17 +54,18 @@ const productSchema = new Schema({
                 message : "Sale price ({VALUE}) cannot be higher than the original price."
             }
         },
-        ratingAverage : {
-            type : Number,
-            default : 0,
-            min : [0, "Rating cannot be less than 0."],
-            max : [5, "Rating cannot be greater than 5."],
-            set : (val: number) => Math.round(val * 10) / 10
-        },
-        ratingCount : {
-            type : Number,
-            default : 0
-        },
+        // TODO: Add rating system
+        // ratingAverage : {
+        //     type : Number,
+        //     default : 0,
+        //     min : [0, "Rating cannot be less than 0."],
+        //     max : [5, "Rating cannot be greater than 5."],
+        //     set : (val: number) => Math.round(val * 10) / 10
+        // },
+        // ratingCount : {
+        //     type : Number,
+        //     default : 0
+        // },
         // Clothing Specific
         gender : {
             type : String,

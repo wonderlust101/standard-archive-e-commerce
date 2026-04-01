@@ -1,6 +1,8 @@
 import express from 'express';
 import { globalErrorHandler } from "./middleware/globalErrorHandler";
 import { NotFoundError } from "./errors/NotFoundError";
+import authRouter from "./routes/auth.route";
+import productRouter from "./routes/product.route";
 
 // Initializing express
 const app = express();
@@ -10,6 +12,8 @@ app.use(express.json());
 app.use(express.urlencoded({extended : true}));
 
 // Routes
+app.use("/api/v1/products", productRouter)
+app.use("/api/v1/auth", authRouter)
 
 // Route Catch All
 app.use((req, res, next) => {
