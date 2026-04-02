@@ -1,6 +1,7 @@
 import mongoose, { HydratedDocument, InferSchemaType, Schema } from "mongoose";
 import { addressSchema } from "./common/Address.schema";
 import argon2 from 'argon2';
+import { PhoneSchema } from "./common/Phone.schema";
 
 type UserMethods = {
     comparePassword : (candidatePassword : string) => Promise<boolean>
@@ -10,7 +11,7 @@ const userSchema = new Schema({
         firstName : {
             type : String,
             required : [true, "First name is missing. Please provide a first name for the user."],
-            trim : true
+            trim : true,
         },
         lastName : {
             type : String,
@@ -23,6 +24,10 @@ const userSchema = new Schema({
             unique : true,
             lowercase : true,
             match : [/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, "Please fill a valid email address"]
+        },
+        phoneNumbers: {
+            type: [PhoneSchema],
+            default: []
         },
         // Security
         password : {
