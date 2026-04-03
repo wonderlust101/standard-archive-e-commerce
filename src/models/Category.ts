@@ -35,6 +35,7 @@ const categorySchema = new Schema({
     // Clothing Specific
     thumbnail: {
         type: String,
+        required: [true, "Category thumbnail is missing. Please provide a thumbnail for the category."],
     },
     status: {
         type: String,
@@ -57,6 +58,7 @@ const categorySchema = new Schema({
 categorySchema.index({order : 1});
 
 // Virtuals
+// TODO: Fix to cascade the slug to the parent category
 categorySchema.virtual('fullPath').get(function() {
     if (this.parentCategory && typeof this.parentCategory === 'object' && 'slug' in this.parentCategory) {
         return `${(this.parentCategory as any).slug}/${this.slug}`;

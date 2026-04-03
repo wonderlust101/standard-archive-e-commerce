@@ -1,7 +1,7 @@
 import { RequestHandler } from "express";
-import { AuthService } from "../services/auth.service";
 import { APIRequest } from "../@types/APIRequest";
 import { AuthUser } from "../@types/User";
+import AuthService from "../services/auth.service";
 
 const authService = new AuthService();
 
@@ -21,9 +21,9 @@ export const login: RequestHandler<{}, APIRequest<string>> = async (req, res) =>
     });
 
     return res.status(200).json({
-        success: true,
-        message : "Login successful!",
-        data: loginToken
+        success : true,
+        message : "Welcome back. You have successfully signed into your Standard Archive account.",
+        data : loginToken
     });
 };
 
@@ -31,7 +31,6 @@ export const login: RequestHandler<{}, APIRequest<string>> = async (req, res) =>
 // TODO: ADD ZOD SCHEMA
 export const register: RequestHandler<{}, APIRequest<string>> = async (req, res) => {
     const {firstName, lastName, email, password, phoneNumbers, savedAddresses} = req.body;
-
     const registrationToken = await authService.register({firstName, lastName, email, password, phoneNumbers, savedAddresses});
 
     res.cookie("authToken", registrationToken, {
@@ -42,9 +41,9 @@ export const register: RequestHandler<{}, APIRequest<string>> = async (req, res)
     });
 
     return res.status(200).json({
-        success: true,
-        message : "Registration successful!",
-        data: registrationToken
+        success : true,
+        message : "Welcome to Standard Archive. Your account has been created successfully.",
+        data : registrationToken
     });
 };
 
@@ -53,8 +52,8 @@ export const logout: RequestHandler<{}, APIRequest> = async (req, res) => {
     res.clearCookie("authToken");
 
     return res.status(200).json({
-        success: true,
-        message : "Logout successful!"
+        success : true,
+        message : "You have been successfully signed out. We hope to see you again soon."
     });
 };
 
@@ -62,37 +61,31 @@ export const logout: RequestHandler<{}, APIRequest> = async (req, res) => {
 
 // GET /api/verify-email/:token
 export const verifyEmail: RequestHandler<{token: string}, APIRequest> = async (req, res) => {
-    const {token} = req.params;
-
-    await authService.verifyEmail(token);
+    await authService.verifyEmail(req.params.token);
 
     return res.status(200).json({
-        success: true,
-        message : "Email verification successful!"
+        success : true,
+        message : "Your email has been successfully verified. You now have full access to your account."
     });
 };
 
 // GET /api/forgot-password
 export const forgotPassword: RequestHandler<{}, APIRequest> = async (req, res) => {
-    const {email} = req.body;
-    await authService.forgetPassword(email);
+    await authService.forgetPassword(req.body.email);
 
     return res.status(200).json({
-        success: true,
-        message : "If an account with that email exists, a reset link has been sent."
+        success : true,
+        message : "If an account is associated with this email, you will receive a password reset link shortly. Please check your inbox and spam folder."
     });
 };
 
 // GET /api/reset-password/:token
 export const resetPassword: RequestHandler<{token: string}, APIRequest> = async (req, res) => {
-    const {token} = req.params;
-    const {password} = req.body;
-
-    await authService.resetPassword(token, password);
+    await authService.resetPassword(req.params.token, req.body.password);
 
     return res.status(200).json({
-        success: true,
-        message : "Password reset successful!"
+        success : true,
+        message : "Your password has been successfully updated. You can now sign in with your new credentials."
     });
 };
 
@@ -101,8 +94,8 @@ export const resetPassword: RequestHandler<{token: string}, APIRequest> = async 
 // GET /api/getMe
 export const getMe: RequestHandler<{}, APIRequest<AuthUser>> = async (req, res) => {
     return res.status(200).json({
-        success: true,
+        success : true,
         message : "User data retrieved successfully.",
-        data: req.user
+        data : req.user
     });
 };

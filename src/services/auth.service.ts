@@ -1,33 +1,34 @@
 import { UnauthorizedError } from "../errors/UnauthorizedError";
 import User from '../models/User.model';
 import jwt from 'jsonwebtoken';
-import { LoginDTO, RegisterDTO } from "../dtos/auth.dto";
 import { ConflictError } from "../errors/ConflictError";
 import * as crypto from "node:crypto";
+
+// TODO: Replace any with zod schema
 
 if (!process.env.JWT_SECRET)
     throw new Error("JWT_SECRET is not defined in your environment variables. Please check your .env file.");
 
-export class AuthService {
-    public async login(loginDTO: LoginDTO) {
+export default class AuthService {
+    public async login(loginDTO: any) {
         const {email, password} = loginDTO;
 
         const user = await User.findOne({email}).select('+password');
 
         if (!user || !(await user.comparePassword(password)))
-            throw new UnauthorizedError("Invalid email or password. Please try logging in again.");
+            throw new UnauthorizedError("The email or password you entered is incorrect. Please try again or reset your password.");
 
         const {id, role, isEmailVerified} = user;
 
         return jwt.sign({id, role, isEmailVerified}, process.env.JWT_SECRET!, {expiresIn : '7d'});
     }
 
-    public async register(registerDTO: RegisterDTO) {
+    public async register(registerDTO: any) {
         const {email} = registerDTO;
         const existingUser = await User.findOne({email});
 
         if (existingUser)
-            throw new ConflictError("Email already in use. Please use a different email or log in.");
+            throw new ConflictError("An account with this email address already exists. Please sign in or use a different email.");
 
         const verificationToken = crypto.randomBytes(32).toString('hex');
         const hashedToken = crypto.createHash('sha256').update(verificationToken).digest('hex');
@@ -55,7 +56,7 @@ export class AuthService {
         });
 
         if (!user)
-            throw new UnauthorizedError("Invalid or expired verification link. Please try again.");
+            throw new UnauthorizedError("This verification link is invalid or has expired. Please request a new verification email from your account settings.");
 
         user.isEmailVerified = true;
         user.verificationCode = null;
@@ -97,7 +98,7 @@ export class AuthService {
         });
 
         if (!user)
-            throw new UnauthorizedError("Invalid or expired verification link. Please try again.");
+            throw new UnauthorizedError("The password reset link has expired. Please request a new link to continue.");
 
         user.password = newPassword;
         user.resetPasswordToken = null;
