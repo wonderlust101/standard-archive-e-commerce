@@ -25,6 +25,24 @@ const userSchema = new Schema({
             lowercase : true,
             match : [/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, "Please fill a valid email address"]
         },
+        verificationCode : {
+            type : String,
+            unique : true,
+            sparse : true
+        },
+        verificationCodeExpiry : {
+            type : Date,
+            default : null,
+        },
+        resetPasswordToken : {
+            type : String,
+            unique : true,
+            sparse : true
+        },
+        resetPasswordExpires : {
+            type : Date,
+            default : null,
+        },
         phoneNumbers: {
             type: [PhoneSchema],
             default: []

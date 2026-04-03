@@ -1,7 +1,8 @@
 import { ErrorRequestHandler } from "express";
 import { AppError } from "../errors/AppError";
+import { APIErrorRequest } from "../@types/APIRequest";
 
-export const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => {
+export const globalErrorHandler: ErrorRequestHandler<{}, APIErrorRequest> = (err, req, res, next) => {
     let statusCode = err.statusCode || 500;
     let message = err.message || "We're experiencing some technical difficulties on our end. Please try again later.";
 
@@ -37,6 +38,7 @@ export const globalErrorHandler: ErrorRequestHandler = (err, req, res, next) => 
     res.status(statusCode).json({
         success : false,
         message : message,
+        statusCode : statusCode,
         ...(process.env.NODE_ENV === 'development' && {stack : err.stack})
     });
 };
