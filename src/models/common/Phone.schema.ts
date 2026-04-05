@@ -4,7 +4,7 @@ export const PhoneSchema = new Schema({
     phoneNumber : {
         type : String,
         required : [true, "Phone number is missing. Please provide a phone number for the user."],
-        match : [/^[0-9]{10}$/, "Please fill a valid 10-digit phone number"],
+        match: [/^\+?[0-9]{10,15}$/, "Please provide a valid contact number (e.g., 555 010 0123)."],
         trim : true
     },
     phoneNumberType : {

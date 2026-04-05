@@ -3,6 +3,7 @@ import User from '../models/User.model';
 import jwt from 'jsonwebtoken';
 import { ConflictError } from "../errors/ConflictError";
 import * as crypto from "node:crypto";
+import { LoginValidation, RegisterValidation } from "../validation/auth.validation";
 
 // TODO: Replace any with zod schema
 
@@ -10,7 +11,7 @@ if (!process.env.JWT_SECRET)
     throw new Error("JWT_SECRET is not defined in your environment variables. Please check your .env file.");
 
 export default class AuthService {
-    public async login(loginDTO: any) {
+    public async login(loginDTO: LoginValidation) {
         const {email, password} = loginDTO;
 
         const user = await User.findOne({email}).select('+password');
@@ -23,7 +24,7 @@ export default class AuthService {
         return jwt.sign({id, role, isEmailVerified}, process.env.JWT_SECRET!, {expiresIn : '7d'});
     }
 
-    public async register(registerDTO: any) {
+    public async register(registerDTO: RegisterValidation) {
         const {email} = registerDTO;
         const existingUser = await User.findOne({email});
 

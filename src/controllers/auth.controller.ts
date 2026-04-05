@@ -2,16 +2,15 @@ import { RequestHandler } from "express";
 import { APIRequest } from "../@types/APIRequest";
 import { AuthUser } from "../@types/User";
 import AuthService from "../services/auth.service";
+import { ForgetPasswordValidation, LoginValidation, RegisterValidation, ResetPasswordValidation, TokenParamValidation } from "../validation/auth.validation";
 
 const authService = new AuthService();
 
 // ── BASIC AUTH ROUTES ─────────────────────────────────────────────────────────────
 
 // GET /api/login
-// TODO: ADD ZOD SCHEMA
-export const login: RequestHandler<{}, APIRequest<string>> = async (req, res) => {
-    const {email, password} = req.body;
-    const loginToken = await authService.login({email, password});
+export const login: RequestHandler<{}, APIRequest<string>, LoginValidation> = async (req, res) => {
+    const loginToken = await authService.login(req.body);
 
     res.cookie("authToken", loginToken, {
         httpOnly : true,
@@ -28,10 +27,8 @@ export const login: RequestHandler<{}, APIRequest<string>> = async (req, res) =>
 };
 
 // GET /api/register
-// TODO: ADD ZOD SCHEMA
-export const register: RequestHandler<{}, APIRequest<string>> = async (req, res) => {
-    const {firstName, lastName, email, password, phoneNumbers, savedAddresses} = req.body;
-    const registrationToken = await authService.register({firstName, lastName, email, password, phoneNumbers, savedAddresses});
+export const register: RequestHandler<{}, APIRequest<string>, RegisterValidation> = async (req, res) => {
+    const registrationToken = await authService.register(req.body);
 
     res.cookie("authToken", registrationToken, {
         httpOnly : true,
@@ -60,7 +57,7 @@ export const logout: RequestHandler<{}, APIRequest> = async (req, res) => {
 // ── ACCOUNT RECOVERY AND VERIFICATION ROUTES ─────────────────────────────────────────
 
 // GET /api/verify-email/:token
-export const verifyEmail: RequestHandler<{token: string}, APIRequest> = async (req, res) => {
+export const verifyEmail: RequestHandler<TokenParamValidation, APIRequest> = async (req, res) => {
     await authService.verifyEmail(req.params.token);
 
     return res.status(200).json({
@@ -70,7 +67,7 @@ export const verifyEmail: RequestHandler<{token: string}, APIRequest> = async (r
 };
 
 // GET /api/forgot-password
-export const forgotPassword: RequestHandler<{}, APIRequest> = async (req, res) => {
+export const forgotPassword: RequestHandler<{}, APIRequest, ForgetPasswordValidation> = async (req, res) => {
     await authService.forgetPassword(req.body.email);
 
     return res.status(200).json({
@@ -80,7 +77,7 @@ export const forgotPassword: RequestHandler<{}, APIRequest> = async (req, res) =
 };
 
 // GET /api/reset-password/:token
-export const resetPassword: RequestHandler<{token: string}, APIRequest> = async (req, res) => {
+export const resetPassword: RequestHandler<TokenParamValidation, APIRequest, ResetPasswordValidation> = async (req, res) => {
     await authService.resetPassword(req.params.token, req.body.password);
 
     return res.status(200).json({

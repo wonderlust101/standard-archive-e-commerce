@@ -4,21 +4,30 @@ import argon2 from 'argon2';
 import { PhoneSchema } from "./common/Phone.schema";
 
 type UserMethods = {
-    comparePassword : (candidatePassword : string) => Promise<boolean>
+    comparePassword: (candidatePassword: string) => Promise<boolean>
 }
 
 const userSchema = new Schema({
         firstName : {
             type : String,
             required : [true, "First name is missing. Please provide a first name for the user."],
-            trim : true,
+            trim : true
         },
         lastName : {
             type : String,
             required : [true, "Last name is missing. Please provide a last name for the user."],
             trim : true
         },
-        email: {
+        dateOfBirth : {
+            type : Date,
+            optional : true
+        },
+        gender : {
+            type : String,
+            enum : ['male', 'female', "other"],
+            required : [true, "Gender is missing. Please provide a gender for the user."]
+        },
+        email : {
             type : String,
             required : [true, "Email is missing. Please provide a email for the user."],
             unique : true,
@@ -32,7 +41,7 @@ const userSchema = new Schema({
         },
         verificationCodeExpiry : {
             type : Date,
-            default : null,
+            default : null
         },
         resetPasswordToken : {
             type : String,
@@ -41,11 +50,7 @@ const userSchema = new Schema({
         },
         resetPasswordExpires : {
             type : Date,
-            default : null,
-        },
-        phoneNumbers: {
-            type: [PhoneSchema],
-            default: []
+            default : null
         },
         // Security
         password : {
@@ -73,10 +78,18 @@ const userSchema = new Schema({
             type : [addressSchema],
             default : []
         },
+        phoneNumbers : {
+            type : [PhoneSchema],
+            default : []
+        },
         wishList : [{
-            type: Schema.Types.ObjectId,
+            type : Schema.Types.ObjectId,
             ref : "Product"
         }],
+        newsletterSubscription : {
+            type : Boolean,
+            default : true
+        },
         // Cart
         cart : [
             {
@@ -89,17 +102,17 @@ const userSchema = new Schema({
                     default : 1
                 },
                 // Variant details
-                sku: {
-                    type: String,
-                    required: [true, "Product SKU is missing. Please provide a SKU for the product."]
+                sku : {
+                    type : String,
+                    required : [true, "Product SKU is missing. Please provide a SKU for the product."]
                 },
-                color: {
-                    type: String,
-                    required: [true, "Product color is missing. Please provide a color for the product."]
+                color : {
+                    type : String,
+                    required : [true, "Product color is missing. Please provide a color for the product."]
                 },
-                size: {
-                    type: String,
-                    required: [true, "Product size is missing. Please provide a size for the product."]
+                size : {
+                    type : String,
+                    required : [true, "Product size is missing. Please provide a size for the product."]
                 }
             }
         ]
@@ -118,27 +131,27 @@ const userSchema = new Schema({
 );
 
 // Indexes
-userSchema.index({ lastName: 1, firstName: 1 });
-userSchema.index({ role: 1 });
-userSchema.index({ isEmailVerified: 1 });
+userSchema.index({lastName : 1, firstName : 1});
+userSchema.index({role : 1});
+userSchema.index({isEmailVerified : 1});
 
 // Methods
-userSchema.methods.comparePassword = async function(candidatePassword : string) {
+userSchema.methods.comparePassword = async function (candidatePassword: string) {
     return await argon2.verify(this.password, candidatePassword);
-}
+};
 
 // Virtuals
-userSchema.virtual('fullName').get(function() {
+userSchema.virtual('fullName').get(function () {
     return `${this.firstName} ${this.lastName}`;
 });
 
 // Hooks
-userSchema.pre('save', async function() {
+userSchema.pre('save', async function () {
     if (!this.isModified('password'))
         return;
 
     this.password = await argon2.hash(this.password);
-})
+});
 
 export type UserRaw = InferSchemaType<typeof userSchema>;
 export type UserDocument = HydratedDocument<UserRaw, UserMethods>;
