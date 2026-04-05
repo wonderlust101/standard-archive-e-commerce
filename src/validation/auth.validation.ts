@@ -43,7 +43,10 @@ export const registerValidation = z.object({
     newsletterSubscription : z.boolean().default(true),
 });
 
-export const tokenParamValidation = z.object({
+export const forgetPasswordValidation = registerValidation.pick({email : true})
+export const resetPasswordValidation = registerValidation.pick({password : true})
+
+export const tokenParamsValidation = z.object({
     token: z
         .string()
         .trim()
@@ -51,12 +54,9 @@ export const tokenParamValidation = z.object({
         .max(255, { message: "The provided token is invalid." })
 });
 
-export const forgetPasswordValidation = registerValidation.pick({email : true})
-export const resetPasswordValidation = registerValidation.pick({password : true})
-
 export type LoginValidation = z.infer<typeof loginValidation>;
 export type RegisterValidation = z.infer<typeof registerValidation>;
 export type ForgetPasswordValidation = z.infer<typeof forgetPasswordValidation>;
 export type ResetPasswordValidation = z.infer<typeof resetPasswordValidation>;
 
-export type TokenParamValidation = z.infer<typeof tokenParamValidation>;
+export type TokenParamValidation = z.infer<typeof tokenParamsValidation>;

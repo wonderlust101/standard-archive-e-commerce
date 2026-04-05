@@ -2,9 +2,9 @@ import { Request, Response, NextFunction } from 'express';
 import { ZodObject } from 'zod';
 
 type Schema = {
-    body: ZodObject;
-    params: ZodObject;
-    query: ZodObject;
+    body?: ZodObject;
+    params?: ZodObject;
+    query?: ZodObject;
 }
 
 export const validate = (schema: Schema) => {
