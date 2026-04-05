@@ -13,7 +13,7 @@ export default class CategoryService {
     public async getAllCategories() {
         const categories = await Category.find();
 
-        // Add filtering logic here if needed
+        // TODO: Add filtering logic here if needed
 
         return categories;
     }
@@ -25,8 +25,8 @@ export default class CategoryService {
         const tree: CategoryTreeNode[] = [];
 
         categories.forEach(category => {
-            categoryMap[category._id.toString()] = {...category, children: []};
-        })
+            categoryMap[category._id.toString()] = {...category, children : []};
+        });
 
         categories.forEach(category => {
             const categoryID = category._id.toString();
@@ -37,7 +37,7 @@ export default class CategoryService {
                 // Add the category to its parent's children array'
                 if (categoryMap[parentID]) {
                     categoryMap[parentID].children.push(categoryMap[categoryID]);
-                // If the category is a root category
+                    // If the category is a root category
                 } else {
                     tree.push(categoryMap[categoryID]);
                 }
@@ -45,7 +45,7 @@ export default class CategoryService {
                 // If the category is a root category
                 tree.push(categoryMap[categoryID]);
             }
-        })
+        });
 
         return tree;
     }
@@ -54,16 +54,16 @@ export default class CategoryService {
         const category = await Category.findById(id);
 
         if (!category)
-            throw new NotFoundError("Unable to find category. Please check the ID and try again.")
+            throw new NotFoundError("Unable to find category. Please check the ID and try again.");
 
         return category;
     }
 
     public async getCategoryBySlug(slug: string) {
-        const category = await Category.findOne({slug})
+        const category = await Category.findOne({slug});
 
         if (!category)
-            throw new NotFoundError("Unable to find category. Please check the URL and try again.")
+            throw new NotFoundError("Unable to find category. Please check the URL and try again.");
 
         return category;
     }
@@ -72,24 +72,22 @@ export default class CategoryService {
         return await Category.create(createCategoryDTO);
     }
 
-    // TODO: Fix updateCategory method to cascade update parents
     public async updateCategory(id: string, updateCategoryDTO: any) {
-        const updatedCategory = await Category.findByIdAndUpdate(id, updateCategoryDTO, {
-            runValidators: true,
-            returnDocument: "after"
-        })
+        const category = await Category.findById(id);
 
-        if (!updatedCategory)
-            throw new NotFoundError("Unable to find category. Please check the ID and try again.")
+        if (!category)
+            throw new NotFoundError("Unable to find category. Please check the ID and try again.");
 
-        return updatedCategory;
+        Object.assign(category, updateCategoryDTO);
+
+        return await category.save();
     }
 
     public async deleteCategory(id: string) {
         const deletedCategory = await Category.findByIdAndDelete(id);
 
         if (!deletedCategory)
-            throw new NotFoundError("Unable to find category. Please check the ID and try again.")
+            throw new NotFoundError("Unable to find category. Please check the ID and try again.");
 
         return deletedCategory;
     }

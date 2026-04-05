@@ -6,6 +6,7 @@ import CategoryService, { CategoryTreeNode } from "../services/category.service"
 const categoryService = new CategoryService();
 
 // ── STATIC GET ROUTES ─────────────────────────────────────────────────────────────
+
 // GET /api/categories
 // TODO: Add zod types
 export const getCategories: RequestHandler<{}, APIRequest<CategoryRaw[]>> = async (req, res) => {
