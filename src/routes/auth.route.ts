@@ -16,5 +16,4 @@ authRouter.post('/reset-password/:token', validate({body : resetPasswordValidati
 
 authRouter.get('/me', getMe);
 
-
 export default authRouter;

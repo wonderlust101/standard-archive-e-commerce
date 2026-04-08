@@ -1,5 +1,5 @@
 import express from 'express';
-import { globalErrorHandler } from "./middleware/globalErrorHandler";
+import { globalErrorHandlerMiddleware } from "./middleware/globalErrorHandler.middleware";
 import { NotFoundError } from "./errors/NotFoundError";
 import authRouter from "./routes/auth.route";
 import productRouter from "./routes/product.route";
@@ -21,6 +21,6 @@ app.use((req, res, next) => {
 });
 
 // Global Error Handler
-app.use(globalErrorHandler);
+app.use(globalErrorHandlerMiddleware);
 
 export default app;
