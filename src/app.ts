@@ -3,6 +3,7 @@ import { globalErrorHandlerMiddleware } from "./middleware/globalErrorHandler.mi
 import { NotFoundError } from "./errors/NotFoundError";
 import authRouter from "./routes/auth.route";
 import productRouter from "./routes/product.route";
+import categoryRouter from "./routes/category.route";
 import cookieParser from "cookie-parser";
 
 // Initializing express
@@ -16,6 +17,7 @@ app.use(cookieParser())
 // Routes
 app.use("/api/v1/products", productRouter)
 app.use("/api/v1/auth", authRouter)
+app.use("/api/v1/categories", categoryRouter)
 
 // Route Catch All
 app.use((req, res, next) => {

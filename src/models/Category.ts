@@ -86,6 +86,7 @@ categorySchema.pre("findOneAndDelete", async function () {
 
     if (docToUpdate) {
         const hasChildren = await this.model.exists({parentCategory : docToUpdate._id});
+
         if (hasChildren) {
             throw new ConflictError("Cannot delete category because it has sub-categories. Please move or delete them first.");
         }
