@@ -3,6 +3,7 @@ import { APIRequest } from "../@types/APIRequest";
 import { AuthUser } from "../@types/User";
 import AuthService from "../services/auth.service";
 import { ForgetPasswordValidation, LoginValidation, RegisterValidation, ResetPasswordValidation, TokenParamValidation } from "../validation/auth.validation";
+import { UnauthorizedError } from "../errors/UnauthorizedError";
 
 const authService = new AuthService();
 
@@ -90,6 +91,10 @@ export const resetPassword: RequestHandler<TokenParamValidation, APIRequest, Res
 
 // GET /api/getMe
 export const getMe: RequestHandler<{}, APIRequest<AuthUser>> = async (req, res) => {
+    if (!req.user) {
+        throw new UnauthorizedError();
+    }
+
     return res.status(200).json({
         success : true,
         message : "User data retrieved successfully.",

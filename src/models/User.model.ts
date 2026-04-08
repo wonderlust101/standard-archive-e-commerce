@@ -7,6 +7,10 @@ type UserMethods = {
     comparePassword: (candidatePassword: string) => Promise<boolean>
 }
 
+type UserVirtuals = {
+    fullName: string
+}
+
 const userSchema = new Schema({
         firstName : {
             type : String,
@@ -19,8 +23,7 @@ const userSchema = new Schema({
             trim : true
         },
         dateOfBirth : {
-            type : Date,
-            optional : true
+            type : Date
         },
         gender : {
             type : String,
@@ -154,6 +157,6 @@ userSchema.pre('save', async function () {
 });
 
 export type UserRaw = InferSchemaType<typeof userSchema>;
-export type UserDocument = HydratedDocument<UserRaw, UserMethods>;
+export type UserDocument = HydratedDocument<UserRaw & UserMethods & UserVirtuals>;
 
 export default mongoose.model<UserDocument>('User', userSchema);

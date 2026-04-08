@@ -2,6 +2,7 @@ import { Router } from "express";
 import { forgotPassword, getMe, login, logout, register, resetPassword, verifyEmail } from "../controllers/auth.controller";
 import { validate } from "../middleware/validate.middleware";
 import { forgetPasswordValidation, loginValidation, registerValidation, resetPasswordValidation, tokenParamsValidation } from "../validation/auth.validation";
+import { authenticateUser } from "../middleware/authenticateUser.middleware";
 
 const authRouter = Router();
 
@@ -14,6 +15,6 @@ authRouter.get('/verify-email/:token', validate({params : tokenParamsValidation}
 authRouter.post('/forgot-password', validate({body : forgetPasswordValidation}), forgotPassword);
 authRouter.post('/reset-password/:token', validate({body : resetPasswordValidation, params : tokenParamsValidation}), resetPassword);
 
-authRouter.get('/me', getMe);
+authRouter.get('/me', authenticateUser, getMe);
 
 export default authRouter;

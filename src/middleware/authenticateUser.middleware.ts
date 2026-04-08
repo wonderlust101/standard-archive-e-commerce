@@ -2,6 +2,9 @@ import { Request, Response, NextFunction } from "express";
 import { UnauthorizedError } from "../errors/UnauthorizedError";
 import jwt, {JwtPayload} from "jsonwebtoken";
 
+if (!process.env.JWT_SECRET)
+    throw new Error("JWT_SECRET not defined.");
+
 export const authenticateUser = (req: Request, res: Response, next: NextFunction) => {
     const authToken = req.cookies.authToken;
 
@@ -12,6 +15,7 @@ export const authenticateUser = (req: Request, res: Response, next: NextFunction
 
     req.user = {
         id: decodedToken.id,
+        name: decodedToken.name,
         role: decodedToken.role,
         isEmailVerified: decodedToken.isEmailVerified,
     }

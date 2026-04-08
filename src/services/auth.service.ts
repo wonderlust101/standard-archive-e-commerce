@@ -1,5 +1,5 @@
 import { UnauthorizedError } from "../errors/UnauthorizedError";
-import User from '../models/User.model';
+import User, { UserDocument } from '../models/User.model';
 import jwt from 'jsonwebtoken';
 import { ConflictError } from "../errors/ConflictError";
 import * as crypto from "node:crypto";
@@ -19,9 +19,9 @@ export default class AuthService {
         if (!user || !(await user.comparePassword(password)))
             throw new UnauthorizedError("The email or password you entered is incorrect. Please try again or reset your password.");
 
-        const {id, role, isEmailVerified} = user;
+        const {id, fullName, role, isEmailVerified} = user;
 
-        return jwt.sign({id, role, isEmailVerified}, process.env.JWT_SECRET!, {expiresIn : '7d'});
+        return jwt.sign({id, fullName ,role, isEmailVerified}, process.env.JWT_SECRET!, {expiresIn : '7d'});
     }
 
     public async register(registerDTO: RegisterValidation) {
@@ -44,8 +44,8 @@ export default class AuthService {
         // TODO: Create email service here
         console.log(verificationLink);
 
-        const {id, role, isEmailVerified} = newUser;
-        return jwt.sign({id, role, isEmailVerified}, process.env.JWT_SECRET!, {expiresIn : '7d'});
+        const {id, fullName, role, isEmailVerified} = newUser;
+        return jwt.sign({id, fullName ,role, isEmailVerified}, process.env.JWT_SECRET!, {expiresIn : '7d'});
     }
 
     public async verifyEmail(token: string) {

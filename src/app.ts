@@ -3,6 +3,7 @@ import { globalErrorHandlerMiddleware } from "./middleware/globalErrorHandler.mi
 import { NotFoundError } from "./errors/NotFoundError";
 import authRouter from "./routes/auth.route";
 import productRouter from "./routes/product.route";
+import cookieParser from "cookie-parser";
 
 // Initializing express
 const app = express();
@@ -10,6 +11,7 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({extended : true}));
+app.use(cookieParser())
 
 // Routes
 app.use("/api/v1/products", productRouter)
