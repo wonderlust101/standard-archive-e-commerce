@@ -40,7 +40,7 @@ export const registerValidation = z.object({
         .max(100, {error : "Password exceeds our maximum character limit."}),
     gender : z.enum(["male", "female", "other"], {error : "Please provide a valid gender."}),
     dateOfBirth: z.coerce.date().nullable().default(null),
-    newsletterSubscription : z.boolean().default(true),
+    newsletterSubscription : z.boolean({error : "Newsletter Subscription status must be a simple true or false."}).default(true),
 });
 
 export const forgetPasswordValidation = registerValidation.pick({email : true})

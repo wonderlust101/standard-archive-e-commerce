@@ -77,13 +77,13 @@ const userSchema = new Schema({
             unique : true,
             sparse : true
         },
-        savedAddresses : {
-            type : [addressSchema],
-            default : []
+        savedAddress : {
+            type : addressSchema,
+            default : null
         },
-        phoneNumbers : {
-            type : [PhoneSchema],
-            default : []
+        phoneNumber : {
+            type : PhoneSchema,
+            default : null
         },
         wishList : [{
             type : Schema.Types.ObjectId,
@@ -92,6 +92,11 @@ const userSchema = new Schema({
         newsletterSubscription : {
             type : Boolean,
             default : true
+        },
+        status : {
+            type : String,
+            enum : ['active', 'inactive', "archived"],
+            default : 'active'
         },
         // Cart
         cart : [

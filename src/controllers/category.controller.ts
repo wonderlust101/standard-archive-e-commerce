@@ -46,7 +46,7 @@ export const getCategory: RequestHandler<{id: string}, APIRequest<CategoryRaw>> 
 // GET /api/categories/slug/:slug
 export const getCategoryBySlug: RequestHandler<{slug: string}, APIRequest<CategoryRaw>> = async (req, res) => {
     const fullPath = (req.params.slug as unknown as string[]).join('/');
-    const category = await categoryService.getCategoryBySlug(req.params.slug);
+    const category = await categoryService.getCategoryBySlug(fullPath);
 
     return res.status(200).json({
         success : true,

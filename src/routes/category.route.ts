@@ -17,7 +17,7 @@ categoryRouter.route('/')
 
 categoryRouter.route('/tree').get(getCategoryTree);
 
-categoryRouter.route('/slug/*slug').get(getCategoryBySlug);
+categoryRouter.route('/slug/{*slug}').get(getCategoryBySlug);
 
 categoryRouter.route('/:id')
     .get(getCategory)

@@ -29,11 +29,6 @@ export const toggleWishlist: RequestHandler = async (req, res) => {
     return res.status(200).json({ message : "Toggle item in wishlist" });
 };
 
-// POST /api/users
-export const createUser: RequestHandler = (req, res) => {
-    return res.status(200).json({message : "Create user"});
-};
-
 // ── PATCH & DELETE ROUTES (Modify) ─────────────────────────────────────────────────────────────
 
 // PATCH /api/users/cart/:productId
