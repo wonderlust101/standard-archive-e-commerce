@@ -1,6 +1,7 @@
 import Category, { CategoryRaw } from "../models/Category";
 import { NotFoundError } from "../errors/NotFoundError";
 import mongoose from "mongoose";
+import { CreateCategorySchema, UpdateCategorySchema } from "../validation/category.validation";
 
 export type CategoryTreeNode = CategoryRaw & {
     _id: mongoose.Types.ObjectId;
@@ -68,11 +69,11 @@ export default class CategoryService {
         return category;
     }
 
-    public async createCategory(createCategoryDTO: any) {
+    public async createCategory(createCategoryDTO: CreateCategorySchema) {
         return await Category.create(createCategoryDTO);
     }
 
-    public async updateCategory(id: string, updateCategoryDTO: any) {
+    public async updateCategory(id: string, updateCategoryDTO: UpdateCategorySchema) {
         const category = await Category.findById(id);
 
         if (!category)

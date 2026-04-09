@@ -22,7 +22,7 @@ export const getNewArrivals: RequestHandler = async (req, res) => {
     return res.status(200).json({message : "Get most recently added products"});
 };
 
-// GET /api/products/category/:category
+// GET /api/products/category/:slug
 export const getProductsByCategory: RequestHandler = async (req, res) => {
     return res.status(200).json({message : "Get Products by Category slug"});
 };

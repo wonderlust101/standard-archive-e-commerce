@@ -2,6 +2,8 @@ import { RequestHandler } from "express";
 import { APIRequest } from "../@types/APIRequest";
 import { CategoryRaw } from "../models/Category";
 import CategoryService, { CategoryTreeNode } from "../services/category.service";
+import { CategorySlug, CreateCategorySchema, UpdateCategorySchema } from "../validation/category.validation";
+import { ObjectIdSchema } from "../validation/common/objectID.validation";
 
 const categoryService = new CategoryService();
 
@@ -33,7 +35,7 @@ export const getCategoryTree: RequestHandler<{}, APIRequest<CategoryTreeNode[]>>
 // ── DYNAMIC GET ROUTES ─────────────────────────────────────────────────────────────
 
 // GET /api/categories/:id
-export const getCategory: RequestHandler<{id: string}, APIRequest<CategoryRaw>> = async (req, res) => {
+export const getCategory: RequestHandler<ObjectIdSchema, APIRequest<CategoryRaw>> = async (req, res) => {
     const category = await categoryService.getCategoryByID(req.params.id);
 
     return res.status(200).json({
@@ -44,7 +46,7 @@ export const getCategory: RequestHandler<{id: string}, APIRequest<CategoryRaw>> 
 };
 
 // GET /api/categories/slug/:slug
-export const getCategoryBySlug: RequestHandler<{slug: string}, APIRequest<CategoryRaw>> = async (req, res) => {
+export const getCategoryBySlug: RequestHandler<CategorySlug, APIRequest<CategoryRaw>> = async (req, res) => {
     const fullPath = (req.params.slug as unknown as string[]).join('/');
     const category = await categoryService.getCategoryBySlug(fullPath);
 
@@ -58,8 +60,7 @@ export const getCategoryBySlug: RequestHandler<{slug: string}, APIRequest<Catego
 // ── POST ROUTES (Create / Actions) ─────────────────────────────────────────────────────────────
 
 // POST /api/categories
-// TODO: Add zod schema
-export const createCategory: RequestHandler<{}, APIRequest<CategoryRaw>> = async (req, res) => {
+export const createCategory: RequestHandler<{}, APIRequest<CategoryRaw>, CreateCategorySchema> = async (req, res) => {
     const newCategory = await categoryService.createCategory(req.body);
 
     return res.status(201).json({
@@ -72,7 +73,7 @@ export const createCategory: RequestHandler<{}, APIRequest<CategoryRaw>> = async
 // ── PATCH & DELETE ROUTES (Modify) ─────────────────────────────────────────────────────────────
 
 // PATCH /api/categories/:id
-export const updateCategory: RequestHandler<{id: string}, APIRequest<CategoryRaw>> = async (req, res) => {
+export const updateCategory: RequestHandler<ObjectIdSchema, APIRequest<CategoryRaw>, UpdateCategorySchema> = async (req, res) => {
     const updatedCategory = await categoryService.updateCategory(req.params.id, req.body);
 
     return res.status(200).json({
@@ -83,7 +84,7 @@ export const updateCategory: RequestHandler<{id: string}, APIRequest<CategoryRaw
 };
 
 // DELETE /api/categories/:id
-export const deleteCategory: RequestHandler<{id: string}, APIRequest<CategoryRaw>> = async (req, res) => {
+export const deleteCategory: RequestHandler<ObjectIdSchema, APIRequest<CategoryRaw>> = async (req, res) => {
     const deletedCategory = await categoryService.deleteCategory(req.params.id);
 
     return res.status(200).json({
