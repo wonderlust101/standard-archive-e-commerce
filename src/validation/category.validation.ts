@@ -4,36 +4,38 @@ export const categorySlug = z.object({
     slug : z.string()
         .trim()
         .toLowerCase()
-        .min(1, {error : "A unique URL slug is required for navigation."})
+        .min(1, {error : "A URL slug is required for navigation."})
         .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {error : "Slugs may only contain lowercase letters, numbers, and dashes."})
 });
 
 export const createCategorySchema = z.object({
-    name : z.string()
+    name : z.string({error : "Category names must be provided as text."})
         .trim()
-        .min(1, {message : 'Please enter a category name'})
-        .max(100, {message : 'Category name is too long.'})
-        .regex(/^[a-zA-Z\s-]+$/, {message : 'Category must contain only letters, spaces, or dashes.'}),
-    description : z.string()
+        .min(1, {message : 'Please name this category to proceed.'})
+        .max(100, {message : 'The category name exceeds our standard character limit.'})
+        .regex(/^[a-zA-Z0-9\s\-|]+$/, {message : 'Category must contain only letters, spaces, or dashes.'}),
+    description : z.string({error : "Description must be provided as text."})
         .trim()
-        .min(1, {message : 'Please enter a category description'})
-        .max(5000, {message : 'Category description is too long.'}),
-    shortDescription : z.string()
+        .min(1, {message : 'Please provide a description for this category.'})
+        .max(2000, {message : 'The description is longer than our standard allows.'}),
+    shortDescription : z.string({error : "Short Description must be provided as text."})
         .trim()
-        .min(1, {message : 'Please enter a category short description'})
-        .max(255, {message : 'Category short description is too long.'}),
-    parentCategory : z.string()
-        .length(24, {message : "A standard identifier must be exactly 24 characters."})
+        .min(1, {message : 'Please provide a brief summary for the category.'})
+        .max(100, {message : 'The summary exceeds our standard character limit.'}),
+    parentCategory : z.string({error : "Parent Category ID must be provided as text."})
+        .length(24, {message : "Parent Category ID must be exactly 24 characters."})
         .regex(/^[0-9a-fA-F]{24}$/, {
             message : "The provided entry does not match our standard format. Please check your selection and try again."
-        }),
-    order : z.number()
-        .int()
-        .positive()
+        })
+        .optional()
+        .nullable(),
+    order : z.number({error : "Please provide a valid display order."})
+        .int({error : "The display order must be a whole number."})
+        .nonnegative({error : "The display order cannot be negative."})
         .default(0),
-    thumbnail : z.url({message : 'Please provide a valid URL for the category thumbnail.'})
+    thumbnail : z.url({message : 'The thumbnail link appears to be malformed or invalid.'})
         .trim(),
-    status : z.enum(['active', 'inactive', 'archived'], {message : "Please provide a valid status."})
+    status : z.enum(['active', 'inactive', 'archived'], {message : "Please select a recognized category status."})
         .default("active")
 });
 

@@ -8,8 +8,6 @@ export type CategoryTreeNode = CategoryRaw & {
     children: CategoryTreeNode[];
 };
 
-// TODO: Replace any with zod schema
-
 export default class CategoryService {
     public async getAllCategories() {
         const categories = await Category.find();

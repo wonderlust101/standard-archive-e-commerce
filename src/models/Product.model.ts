@@ -27,7 +27,7 @@ const productSchema = new Schema({
         },
         description : {
             type : String,
-            maxLength : 2000,
+            maxLength : 5000,
             required : [true, "Product description is missing. Please provide a description for the product."],
             trim : true
         },
@@ -35,7 +35,8 @@ const productSchema = new Schema({
             type : Schema.Types.Decimal128,
             required : [true, "Product price is missing. Please provide a price for the product."],
             get : (val: Schema.Types.Decimal128) => parseFloat(val.toString()).toFixed(2),
-            min : [0, "Product price cannot be less than 0."]
+            min : [0, "Product price cannot be less than 0."],
+            max : [1000000, "Product price cannot be greater than 1,000,000."],
         },
         salePrice : {
             type : Schema.Types.Decimal128,
@@ -121,6 +122,8 @@ const productSchema = new Schema({
                 sku : {
                     type : String,
                     required : [true, "Product SKU is missing. Please provide a SKU for the product."],
+                    minlength : [10, "Product SKU must be at least 10 character long."],
+                    maxlength : [10, "Product SKU cannot be longer than 10 characters."],
                     trim : true
                 },
                 size : {

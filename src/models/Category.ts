@@ -11,10 +11,12 @@ const categorySchema = new Schema({
     },
     slug : {
         type : String,
-        unique : true
+        unique : true,
+        regex : /^[a-zA-Z0-9\s\-|]+$/
     },
     description : {
         type : String,
+        maxLength : [2000, "Description cannot exceed 5000 characters."],
         required : [true, "Category description is missing. Please provide a description for the category."],
         trim : true
     },
@@ -31,7 +33,9 @@ const categorySchema = new Schema({
     },
     order : {
         type : Number,
-        required : [true, "Category order is missing. Please provide an order for the category."]
+        required : [true, "Category order is missing. Please provide an order for the category."],
+        min : [0, "Category order cannot be less than 0."],
+        default : 0
     },
     // Clothing Specific
     thumbnail : {
