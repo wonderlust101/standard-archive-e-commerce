@@ -1,41 +1,58 @@
 import { z } from 'zod';
 
 export const categorySlug = z.object({
-    slug : z.string()
+    slug : z.string({error : (iss) => iss.input === undefined
+            ? "A URL slug is required for navigation."
+            : "Slug must be provided in text format."
+    })
         .trim()
         .toLowerCase()
         .min(1, {error : "A URL slug is required for navigation."})
-        .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {error : "Slugs may only contain lowercase letters, numbers, and dashes."})
+        .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {error : "Slugs must contain only lowercase letters, numbers, and hyphens (e.g. new-arrivals)."})
 });
 
 export const createCategorySchema = z.object({
-    name : z.string({error : "Category names must be provided as text."})
+    name : z.string({error : (iss) => iss.input === undefined
+            ? "Every collection in the archive needs a name."
+            : "Category name must be provided in text format."
+    })
         .trim()
-        .min(1, {message : 'Please name this category to proceed.'})
-        .max(100, {message : 'The category name exceeds our standard character limit.'})
-        .regex(/^[a-zA-Z0-9\s\-|]+$/, {message : 'Category must contain only letters, spaces, or dashes.'}),
-    description : z.string({error : "Description must be provided as text."})
+        .min(1, {error : "Every collection in the archive needs a name."})
+        .max(100, {error : "Category names are capped at 100 characters."})
+        .regex(/^[a-zA-Z0-9\s\-|]+$/, {error : "Category names may only contain letters, numbers, spaces, dashes, or pipes."}),
+    description : z.string({error : (iss) => iss.input === undefined
+            ? "A description is required to give this collection context."
+            : "Description must be provided in text format."
+    })
         .trim()
-        .min(1, {message : 'Please provide a description for this category.'})
-        .max(2000, {message : 'The description is longer than our standard allows.'}),
-    shortDescription : z.string({error : "Short Description must be provided as text."})
+        .min(10, {error : "Please write at least a brief description (10 characters minimum) to give this collection context."})
+        .max(2000, {error : "Descriptions are capped at 2000 characters."}),
+    shortDescription : z.string({error : (iss) => iss.input === undefined
+            ? "A short description is required."
+            : "Short description must be provided in text format."
+    })
         .trim()
-        .min(1, {message : 'Please provide a brief summary for the category.'})
-        .max(100, {message : 'The summary exceeds our standard character limit.'}),
-    parentCategory : z.string({error : "Parent Category ID must be provided as text."})
-        .length(24, {message : "Parent Category ID must be exactly 24 characters."})
-        .regex(/^[0-9a-fA-F]{24}$/, {
-            message : "The provided entry does not match our standard format. Please check your selection and try again."
-        })
-        .optional()
-        .nullable(),
-    order : z.number({error : "Please provide a valid display order."})
-        .int({error : "The display order must be a whole number."})
-        .nonnegative({error : "The display order cannot be negative."})
+        .min(10, {error : "The short description must be at least 10 characters."})
+        .max(100, {error : "Short descriptions are capped at 100 characters."}),
+    parentCategory : z.string({error : "The selected parent category is invalid. Please refresh and try again."})
+        .transform(val => val === "" ? null : val)
+        .nullable()
+        .pipe(
+            z.string()
+                .regex(/^[0-9a-fA-F]{24}$/, {
+                    error : "This identifier is not in a recognised format. Please check your selection and try again."
+                })
+                .length(24, {error : "Parent category identifier must be exactly 24 characters."})
+                .nullable()
+        )
+        .optional(),
+    order : z.number({error : "Display order must be a valid number."})
+        .int({error : "Display order must be a whole number."})
+        .nonnegative({error : "Display order must be zero or greater."})
         .default(0),
-    thumbnail : z.url({message : 'The thumbnail link appears to be malformed or invalid.'})
+    thumbnail : z.url({error : "The thumbnail URL appears to be malformed. Please provide a valid link."})
         .trim(),
-    status : z.enum(['active', 'inactive', 'archived'], {message : "Please select a recognized category status."})
+    status : z.enum(['active', 'inactive', 'archived'], {error : "Status must be Active, Inactive, or Archived."})
         .default("active")
 });
 

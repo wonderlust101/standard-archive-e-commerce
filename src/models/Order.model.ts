@@ -10,7 +10,9 @@ const orderSchema = new mongoose.Schema({
         },
         orderNumber : {
             type : String,
-            unique : true
+            unique : true,
+            minlength : [10, "Order number must be at least 10 characters long."],
+            maxlength : [10, "Order number cannot exceed 10 characters."]
         },
         orderType : {
             type : String,
@@ -51,9 +53,10 @@ const orderSchema = new mongoose.Schema({
                 quantity : {
                     type : Number,
                     required : [true, "Product quantity is missing. Please provide a quantity for the product."],
-                    min : [1, "Product quantity cannot be less than 1."]
+                    min : [1, "Product quantity cannot be less than 1."],
+                    max : [10, "Product quantity cannot exceed 10."]
                 },
-                priceAtPurchase : {
+                originalPrice : {
                     type : Schema.Types.Decimal128,
                     required : [true, "Product price at purchase is missing. Please provide a price at purchase for the product."],
                     get : (val: Schema.Types.Decimal128) => parseFloat(val.toString()).toFixed(2)
@@ -128,7 +131,7 @@ orderSchema.pre("save", function () {
 orderSchema.pre("validate", function () {
     if (this.products && this.products.length > 0) {
         const calculatedTotal = this.products.reduce((acc, item) => {
-            const itemPrice = parseFloat(item.priceAtPurchase.toString());
+            const itemPrice = parseFloat(item.originalPrice.toString());
             return acc + (itemPrice * item.quantity);
         }, 0);
 

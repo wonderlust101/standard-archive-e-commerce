@@ -1,57 +1,82 @@
 import { z } from 'zod';
-import { objectIdValidation } from "./common/objectID.validation";
 import { updateAddressValidation } from "./common/address.validation";
 import { updatePhoneValidation } from "./common/phone.validation";
 
 export const updateProfileValidation = z.object({
     firstName : z
-        .string({error : "Names must be provided in text format."})
+        .string({error : "First name must be provided in text format."})
         .trim()
-        .min(1, {error : "Please provide your first name."})
-        .max(100, {error : "First name exceeds our character limit."})
+        .min(1, {error : "First name required."})
+        .max(100, {error : "First names are capped at 100 characters."})
+        .regex(/^[a-zA-Z\s'\-]+$/, {error : "First names may only contain letters, hyphens, or apostrophes."})
         .optional(),
     lastName : z
-        .string({error : "Names must be provided in text format."})
+        .string({error : "Last name must be provided in text format."})
         .trim()
-        .min(1, {error : "Please provide your last name."})
-        .max(100, {error : "Last name exceeds our character limit."})
+        .min(1, {error : "Last name required."})
+        .max(100, {error : "Last names are capped at 100 characters."})
+        .regex(/^[a-zA-Z\s'\-]+$/, {error : "Last names may only contain letters, hyphens, or apostrophes."})
         .optional(),
-    dateOfBirth : z.coerce.date({ error: "Please enter a valid date of birth." }).nullable().optional(),
-    gender : z.enum(["male", "female", "other"], {error : "Please select a recognized gender option."}).optional(),
+    dateOfBirth : z.coerce.date({error : "Please enter a valid date of birth."})
+        .refine((date) => date <= new Date(), {
+            error : "Date of birth cannot be in the future."
+        })
+        .refine((date) => {
+            const minimumAge = new Date();
+            minimumAge.setFullYear(minimumAge.getFullYear() - 13);
+            return date <= minimumAge;
+        }, {error : "You must be at least 13 years old to hold an account."})
+        .nullable()
+        .optional(),
+    gender : z
+        .enum(["male", "female", "other"], {error : "Please select a valid gender option."})
+        .optional(),
     savedAddress : updateAddressValidation.optional(),
     phoneNumber : updatePhoneValidation.optional(),
-    newsletterSubscription : z.boolean({error : "Newsletter Subscription status must be a simple true or false."}).optional()
+    newsletterSubscription : z
+        .boolean({error : "Newsletter preference must be true or false."})
+        .optional()
 });
 
 export const updateUserValidation = updateProfileValidation.extend({
-    role : z.enum(["user", "admin"], {error : "Please provide a valid role."}).optional(),
-    isEmailVerified : z.boolean({error : "Verification status must be a simple true or false."}).optional(),
-    stripeCustomerId : z.string({error : "Stripe Customer ID must be provided in text format."})
-        .trim()
+    role : z
+        .enum(["user", "admin"], {error : "Role must be User or Admin."})
         .optional(),
-    status : z.enum(["active", "inactive"], {error : "Please provide a valid status."}).optional()
+    isEmailVerified : z
+        .boolean({error : "Email verification status must be true or false."})
+        .optional(),
+    stripeCustomerId : z
+        .string({error : "Stripe customer ID must be provided in text format."})
+        .trim()
+        .regex(/^cus_[a-zA-Z0-9]+$/, {error : "Stripe customer IDs must begin with 'cus_' followed by alphanumeric characters."})
+        .optional(),
+    status : z
+        .enum(["active", "inactive"], {error : "Status must be Active or Inactive."})
+        .optional()
 });
 
 export const addToCartValidation = z.object({
-    productId : objectIdValidation,
-    quantity : z.number({error : "Quantity must provided a valid number."})
-        .int({message : "Items must be added in whole quantities."})
-        .positive({message : "Please select a quantity of one or more."})
-        .max(100, {message : "The maximum quantity allowed is 100."})
+    productId : z.string({error : "Product ID must be provided in text format."})
+        .length(24, {error : "The archive uses 24-character identifiers. Please check the Product ID."})
+        .regex(/^[0-9a-fA-F]{24}$/, {
+            error : "This identifier is not in a recognised format. Please check your selection and try again."
+        }),
+    quantity : z.number({error : "Quantity must be a valid number."})
+        .int({error : "Quantity must be a whole number."})
+        .positive({error : "Quantity must be at least 1."})
+        .max(100, {error : "The maximum quantity per item is 100."})
         .default(1),
     sku : z.string({error : "SKU must be provided in text format."})
         .trim()
-        .min(1, {message : "A product reference is required to add this item."})
-        .max(255, {message : "The product reference provided is not recognized."}),
+        .length(10, {error : "Standard Archive SKUs must be exactly 10 characters for inventory integrity."}),
     color : z.string({error : "Color must be provided in text format."})
         .trim()
-        .min(1, {message : "Please choose a color for your selection."})
-        .max(255, {message : "The selected color is currently unavailable"}),
+        .min(1, {error : "Please select a color to continue."})
+        .max(50, {error : "Color must be under 50 characters."}),
     size : z.string({error : "Size must be provided in text format."})
         .trim()
-        .min(1, {message : "Please choose a size to continue."})
-        .max(255, {message : "The selected size is currently unavailable"})
+        .min(1, {error : "Please select a size to continue."})
+        .max(20, {error : "Size must be under 20 characters."})
 });
 
 export const updateCartValidation = addToCartValidation.partial();
-
