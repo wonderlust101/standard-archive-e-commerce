@@ -49,7 +49,7 @@ export const createCategorySchema = z.object({
                 .length(24, {error : "Parent category identifier must be exactly 24 characters."})
                 .nullable()
         )
-        .optional(),
+        .default(null),
     order : z.number({error : "Display order must be a valid number."})
         .int({error : "Display order must be a whole number."})
         .nonnegative({error : "Display order must be zero or greater."})
