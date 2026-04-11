@@ -1,33 +1,37 @@
 import { z } from 'zod';
 
 export const categorySlug = z.object({
-    slug : z.string({error : (iss) => iss.input === undefined
+    slug : z.string({
+        error : (iss) => iss.input === undefined
             ? "A URL slug is required for navigation."
             : "Slug must be provided in text format."
     })
         .trim()
         .toLowerCase()
-        .min(1, {error : "A URL slug is required for navigation."})
-        .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {error : "Slugs must contain only lowercase letters, numbers, and hyphens (e.g. new-arrivals)."})
+        .min(3, {error : "A URL slug is required for navigation."})
+        .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*(?:\/[a-z0-9]+(?:-[a-z0-9]+)*)*$/, {error : "Slugs may only contain lowercase letters, numbers, hyphens, and forward slashes for sub-categories (e.g. mens/new-arrivals)."})
 });
 
 export const createCategorySchema = z.object({
-    name : z.string({error : (iss) => iss.input === undefined
+    name : z.string({
+        error : (iss) => iss.input === undefined
             ? "Every collection in the archive needs a name."
             : "Category name must be provided in text format."
     })
         .trim()
         .min(1, {error : "Every collection in the archive needs a name."})
         .max(100, {error : "Category names are capped at 100 characters."})
-        .regex(/^[a-zA-Z0-9\s\-|]+$/, {error : "Category names may only contain letters, numbers, spaces, dashes, or pipes."}),
-    description : z.string({error : (iss) => iss.input === undefined
+        .regex(/^[a-zA-Z0-9\s',\-|]+$/, {error : "Category names may only contain letters, numbers, spaces, apostrophes, commas, pipes, or dashes."}),
+    description : z.string({
+        error : (iss) => iss.input === undefined
             ? "A description is required to give this collection context."
             : "Description must be provided in text format."
     })
         .trim()
         .min(10, {error : "Please write at least a brief description (10 characters minimum) to give this collection context."})
         .max(2000, {error : "Descriptions are capped at 2000 characters."}),
-    shortDescription : z.string({error : (iss) => iss.input === undefined
+    shortDescription : z.string({
+        error : (iss) => iss.input === undefined
             ? "A short description is required."
             : "Short description must be provided in text format."
     })

@@ -1,4 +1,4 @@
-import Category, { CategoryRaw } from "../models/Category";
+import Category, { CategoryRaw } from "../models/Category.model";
 import { NotFoundError } from "../errors/NotFoundError";
 import mongoose from "mongoose";
 import { CreateCategorySchema, UpdateCategorySchema } from "../validation/category.validation";

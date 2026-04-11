@@ -4,7 +4,7 @@ export const phoneValidation = z.object({
     phoneNumber : z
         .string({
             error : (iss) => iss.input === undefined
-                ? "A contact number is required."
+                ? "A contact number is required. Please provide a phone number."
                 : "Phone number must be provided in text format."
         })
         .trim()

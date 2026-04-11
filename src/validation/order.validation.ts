@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { addressValidation } from "./common/address.validation";
 
 export const createOrderSchema = z.object({
     userId : z.string({error : "User ID must be provided in text format."})
@@ -9,11 +10,11 @@ export const createOrderSchema = z.object({
     orderNumber : z.string({error : "Order number must be provided in text format."})
         .trim()
         .length(10, {error : "Order numbers must be exactly 10 characters."})
-        .regex(/^[a-zA-Z0-9]+$/, {error : "Order numbers may only contain letters and numbers."}),
+        .regex(/^[a-zA-Z0-9\-]+$/, {error : "Order numbers may only contain letters, numbers, and hyphens."}),
     orderType : z.enum(["online", "instore"], {error : "Order type must be Online or In-store."}),
     storeNumber : z.string({error : "Store number must be provided in text format."})
         .trim()
-        .max(20, {error : "Store numbers are capped at 20 characters."})
+        .length(10, {error : "Store numbers must be exactly 10 characters for in-store orders."})
         .regex(/^[a-zA-Z0-9\-]+$/, {error : "Store numbers may only contain letters, numbers, or hyphens."})
         .optional(),
     products : z.array(z.object({
@@ -47,13 +48,35 @@ export const createOrderSchema = z.object({
             .default(1),
         originalPrice : z.number({error : "Price must be a valid number."})
             .min(0, {error : "Prices cannot be negative."})
-    })).min(1, {error : "Every order must contain at least one piece."})
+    })).min(1, {error : "Every order must contain at least one piece."}),
+    shippingAddress : addressValidation,
+    paymentMethod : z.enum(['credit_card', 'paypal', "cash"], {error : "Payment method must be by Credit Card, PayPal, or Cash."}),
+    paymentIntentId : z.string({error : "Payment intent ID must be provided in text format."})
+        .trim()
+        .regex(/^pi_[a-zA-Z0-9]+$/, {error : "Payment intent IDs must begin with 'pi_' followed by alphanumeric characters."})
+        .optional()
 }).superRefine((data, ctx) => {
     if (data.orderType === "instore" && !data.storeNumber?.trim()) {
         ctx.addIssue({
             code : z.ZodIssueCode.custom,
             path : ["storeNumber"],
             message : "A store number is required for in-store orders."
+        });
+    }
+
+    if (data.orderType === "online" && !data.shippingAddress) {
+        ctx.addIssue({
+            code : z.ZodIssueCode.custom,
+            path : ["shippingAddress"],
+            message : "Shipping address is required for online orders."
+        });
+    }
+
+    if (data.paymentMethod === "credit_card" && !data.paymentIntentId?.trim()) {
+        ctx.addIssue({
+            code : z.ZodIssueCode.custom,
+            path : ["paymentIntentId"],
+            message : "A payment intent ID is required for card transactions."
         });
     }
 });

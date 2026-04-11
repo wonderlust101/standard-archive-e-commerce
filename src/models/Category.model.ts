@@ -6,25 +6,31 @@ const categorySchema = new Schema({
     // General
     name : {
         type : String,
+        trim : true,
         required : [true, "Category name is missing. Please provide a name for the category."],
-        trim : true
+        minlength : [1, "Category name must be at least 1 character long."],
+        maxlength : [100, "Category name cannot exceed 100 characters."],
+        match : [/^[a-zA-Z0-9\s',\-|]+$/, "Category names may only contain letters, numbers, spaces, apostrophes, commas, pipes, or dashes."] // Added ' and ,
     },
     slug : {
         type : String,
         unique : true,
-        regex : /^[a-zA-Z0-9\s\-|]+$/
+        minlength : [3, "Category slug must be at least 3 characters long."],
+        match : [/^[a-z0-9]+(?:-[a-z0-9]+)*(?:\/[a-z0-9]+(?:-[a-z0-9]+)*)*$/, "Slugs may only contain lowercase letters, numbers, hyphens, and forward slashes for sub-categories (e.g. mens/new-arrivals)."]
     },
     description : {
         type : String,
-        maxLength : [2000, "Description cannot exceed 5000 characters."],
+        trim : true,
         required : [true, "Category description is missing. Please provide a description for the category."],
-        trim : true
+        minlength : [10, "Description must be at least 10 characters long."],
+        maxlength : [2000, "Description cannot exceed 2000 characters."]
     },
     shortDescription : {
         type : String,
+        trim : true,
         required : [true, "Category short description is missing. Please provide a short description for the category."],
-        maxlength : [100, "Short description cannot exceed 100 characters."],
-        trim : true
+        minlength : [10, "Short description must be at least 10 characters long."],
+        maxlength : [100, "Short description cannot exceed 100 characters."]
     },
     parentCategory : {
         type : Schema.Types.ObjectId,
@@ -33,14 +39,16 @@ const categorySchema = new Schema({
     },
     order : {
         type : Number,
-        required : [true, "Category order is missing. Please provide an order for the category."],
         min : [0, "Category order cannot be less than 0."],
         default : 0
     },
     // Clothing Specific
     thumbnail : {
         type : String,
-        required : [true, "Category thumbnail is missing. Please provide a thumbnail for the category."]
+        trim : true,
+        required : [true, "Category thumbnail is missing. Please provide a thumbnail for the category."],
+        minlength : [10, "Thumbnail must be at least 10 characters long."],
+        match : [/^https?:\/\/.+/, "Please provide a valid URL for the thumbnail."]
     },
     status : {
         type : String,

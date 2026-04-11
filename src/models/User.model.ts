@@ -15,12 +15,18 @@ const userSchema = new Schema({
         firstName : {
             type : String,
             required : [true, "First name is missing. Please provide a first name for the user."],
-            trim : true
+            trim : true,
+            minLength : [1, "First name must be at least 1 characters long."],
+            maxLength : [100, "First name cannot exceed 100 characters."],
+            match : [/^[a-zA-Z\s'\-]+$/, "First name may only contain letters, spaces, hyphens, and apostrophes."]
         },
         lastName : {
             type : String,
             required : [true, "Last name is missing. Please provide a last name for the user."],
-            trim : true
+            trim : true,
+            minLength : [1, "Last name must be at least 1 characters long."],
+            maxLength : [100, "Last name cannot exceed 100 characters."],
+            match : [/^[a-zA-Z\s'\-]+$/, "Last name may only contain letters, spaces, hyphens, and apostrophes."]
         },
         dateOfBirth : {
             type : Date
@@ -35,7 +41,9 @@ const userSchema = new Schema({
             required : [true, "Email is missing. Please provide a email for the user."],
             unique : true,
             lowercase : true,
-            match : [/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, "Please fill a valid email address"]
+            match : [/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, "Please fill a valid email address"],
+            minlength : [1, "Email must be at least 10 characters long."],
+            maxlength : [255, "Email cannot exceed 255 characters."]
         },
         verificationCode : {
             type : String,
@@ -75,7 +83,8 @@ const userSchema = new Schema({
         stripeCustomerId : {
             type : String,
             unique : true,
-            sparse : true
+            sparse : true,
+            match : [/^cus_[a-zA-Z0-9]+$/, "Invalid Stripe Customer ID format."]
         },
         savedAddress : {
             type : addressSchema,
@@ -95,7 +104,7 @@ const userSchema = new Schema({
         },
         status : {
             type : String,
-            enum : ['active', 'inactive', "archived"],
+            enum : ['active', 'inactive'],
             default : 'active'
         },
         // Cart
@@ -107,20 +116,31 @@ const userSchema = new Schema({
                 },
                 quantity : {
                     type : Number,
-                    default : 1
+                    default : 1,
+                    min : [1, "Quantity must be at least 1."],
+                    max : [100, "The maximum quantity per item is 100."]
                 },
-                // Variant details
                 sku : {
                     type : String,
-                    required : [true, "Product SKU is missing. Please provide a SKU for the product."]
+                    required : [true, "Product SKU is missing. Please provide a SKU for the product."],
+                    minlength : [10, "Product SKU must be at least 10 character long."],
+                    maxlength : [10, "Product SKU cannot be longer than 10 characters."],
+                    trim : true
                 },
                 color : {
                     type : String,
-                    required : [true, "Product color is missing. Please provide a color for the product."]
+                    required : [true, "Product color is missing. Please provide a color for the product."],
+                    minlength : [1, "Product color code must be at least 3 characters long."],
+                    maxlength : [50, "Product color code cannot be longer than 50 characters."],
+                    trim : true
                 },
                 size : {
                     type : String,
-                    required : [true, "Product size is missing. Please provide a size for the product."]
+                    required : [true, "Product size is missing. Please provide a size for the product."],
+                    enum : {
+                        values : ["XXS", "XS", "S", "M", "L", "XL", "XXL"],
+                        message : "{VALUE} is not a valid size option"
+                    }
                 }
             }
         ]

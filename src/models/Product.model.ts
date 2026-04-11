@@ -7,7 +7,10 @@ const productSchema = new Schema({
         name : {
             type : String,
             required : [true, "Product name is missing. Please provide a name for the product."],
-            trim : true
+            trim : true,
+            minlength : [1, "Product name must be at least 1 characters long."],
+            maxlength : [100, "Product name cannot exceed 100 characters."],
+            match : [/^[a-zA-Z0-9\s',\-|]+$/, "Product names may only contain letters, numbers, spaces, apostrophes, commas, pipes, or dashes."]
         },
         slug : {
             type : String,
@@ -23,11 +26,12 @@ const productSchema = new Schema({
                 values : ["pending", "draft", "published", "discontinued"],
                 message : "{VALUE} is not a valid status option"
             },
-            default : "draft"
+            default : "pending"
         },
         description : {
             type : String,
-            maxLength : 5000,
+            minlength : [10, "Product description must be at least 10 characters long."],
+            maxLength : [5000, "Product description cannot exceed 5000 characters."],
             required : [true, "Product description is missing. Please provide a description for the product."],
             trim : true
         },
@@ -36,24 +40,22 @@ const productSchema = new Schema({
             required : [true, "Product price is missing. Please provide a price for the product."],
             get : (val: Schema.Types.Decimal128) => parseFloat(val.toString()).toFixed(2),
             min : [0, "Product price cannot be less than 0."],
-            max : [1000000, "Product price cannot be greater than 1,000,000."],
+            max : [1000000, "Product price cannot be greater than 1,000,000."]
         },
         salePrice : {
             type : Schema.Types.Decimal128,
-            required : [true, "Product price is missing. Please provide a price for the product."],
             min : [0, "Product price cannot be less than 0."],
+            max : [1000000, "Product price cannot be greater than 1,000,000."],
             get : (val: Schema.Types.Decimal128) => parseFloat(val.toString()).toFixed(2),
             validate : {
                 validator : function (val: Schema.Types.Decimal128) {
-                    // Convert both to numbers for comparison
                     const sale = parseFloat(val.toString());
                     const original = parseFloat(this.price.toString());
 
-                    // Returns true if valid (sale is less than or equal to original)
                     return sale <= original;
                 },
                 message : "Sale price ({VALUE}) cannot be higher than the original price."
-            }
+            },
         },
         // TODO: Add rating system
         // ratingAverage : {
@@ -84,33 +86,48 @@ const productSchema = new Schema({
         materials : {
             type : String,
             required : [true, "Product materials are missing. Please provide materials for the product."],
-            trim : true
+            trim : true,
+            minlength : [1, "Product materials must be at least 1 characters long."],
+            maxLength : [100, "Product materials cannot exceed 100 characters."],
         },
         careInstructions : {
             type : String,
             required : [true, "Product care instructions are missing. Please provide care instructions for the product."],
-            maxLength : 500,
+            minlength : [1, "Product care instructions must be at least 1 characters long."],
+            maxLength : [1000, "Product care instructions cannot exceed 1000 characters."],
             trim : true
         },
         mainImages : {
             type : [String],
             required : [true, "Product main images are missing. Please provide main images for the product."],
-            unique : [true, "Product main image already in use. Please provide another unique main image for the product."]
+        },
+        sku : {
+            type : String,
+            required : [true, "Product SKU is missing. Please provide a SKU for the product."],
+            minlength : [10, "Product SKU must be at least 10 character long."],
+            maxlength : [10, "Product SKU cannot be longer than 10 characters."],
+            trim : true
         },
         // Variants
         variants : [{
             color : {
                 type : String,
                 required : [true, "Product color is missing. Please provide a color for the product."],
+                minlength : [1, "Product color code must be at least 3 characters long."],
+                maxlength : [50, "Product color code cannot be longer than 50 characters."],
                 trim : true
             },
             colorCode : {
                 type : String,
                 required : [true, "Product color code is missing. Please provide a color code for the product."],
-                trim : true
+                trim : true,
+                minlength : [1, "Product color code must be at least 1 characters long."],
+                maxlength : [10, "Product color code cannot be longer than 10 characters."],
+                match : [/^[a-zA-Z0-9]+$/, "Product color codes may only contain letters and numbers."]
             },
             images : {
-                type : [String]
+                type : [String],
+                required : [true, "Product images are missing. Please provide images for the product."],
             },
             // Sizing
             sizes : [{
@@ -118,13 +135,6 @@ const productSchema = new Schema({
                     type : Number,
                     required : [true, "Product stock is missing. Please provide stock for the product."],
                     min : [0, "Product stock cannot be less than 0."]
-                },
-                sku : {
-                    type : String,
-                    required : [true, "Product SKU is missing. Please provide a SKU for the product."],
-                    minlength : [10, "Product SKU must be at least 10 character long."],
-                    maxlength : [10, "Product SKU cannot be longer than 10 characters."],
-                    trim : true
                 },
                 size : {
                     type : String,
@@ -179,7 +189,7 @@ const productSchema = new Schema({
 // Indexes
 productSchema.index({name : 1});
 productSchema.index({name : "text"});
-productSchema.index({"variants.sizes.sku" : 1}, {unique : true});
+productSchema.index({"sku" : 1}, {unique : true});
 
 // Virtuals
 productSchema.virtual("totalStock").get(function () {

@@ -12,17 +12,21 @@ const orderSchema = new mongoose.Schema({
             type : String,
             unique : true,
             minlength : [10, "Order number must be at least 10 characters long."],
-            maxlength : [10, "Order number cannot exceed 10 characters."]
+            maxlength : [10, "Order number cannot exceed 10 characters."],
+            match : [/^[a-zA-Z0-9\-]+$/, "Order numbers may only contain letters, numbers, and hyphens."]
         },
         orderType : {
             type : String,
-            enum : ['online', 'in-store'],
+            enum : ['online', 'instore'],
             required : [true, "Order type is missing. Please provide a order type for the order."]
         },
         storeNumber : {
             type : String,
-            required : [function (this: any) { return this.orderType === 'in-store'; },
-                "Store number is missing. Please provide a store number for the order."]
+            required : [function (this: any) { return this.orderType === 'instore'; },
+                "Store number is missing. Please provide a store number for the order."],
+            minlength : [10, "Store number must be at least 10 characters long."],
+            maxlength : [10, "Store number cannot exceed 10 characters."],
+            match : [/^[a-zA-Z0-9\-]+$/, "Store numbers may only contain letters, numbers, or hyphens."]
         },
         products : [
             {
@@ -32,23 +36,35 @@ const orderSchema = new mongoose.Schema({
                 },
                 name : {
                     type : String,
-                    required : [true, "Product name is missing. Please provide a name for the product."]
+                    trim : true,
+                    maxlength : [100, "Product names are capped at 100 characters."],
+                    match : [/^[a-zA-Z0-9\s'\-]+$/, "Product names may only contain letters, numbers, spaces, hyphens, or apostrophes."],
+                    required : [true, "Product name is missing."]
                 },
                 sku : {
                     type : String,
-                    required : [true, "Product SKU is missing. Please provide a SKU for the product."]
+                    trim : true,
+                    minlength : [10, "SKU must be exactly 10 characters."],
+                    maxlength : [10, "SKU must be exactly 10 characters."],
+                    required : [true, "Product SKU is missing."]
                 },
                 color : {
                     type : String,
-                    required : [true, "Product color is missing. Please provide a color for the product."]
+                    trim : true,
+                    maxlength : [50, "Color must be under 50 characters."],
+                    required : [true, "Product color is missing."]
                 },
                 size : {
                     type : String,
-                    required : [true, "Product size is missing. Please provide a size for the product."]
+                    trim : true,
+                    maxlength : [20, "Size must be under 20 characters."],
+                    required : [true, "Product size is missing."]
                 },
                 image : {
                     type : String,
-                    required : [true, "Product image is missing. Please provide a image for the product."]
+                    trim : true,
+                    match : [/^https?:\/\/.+/, "Please provide a valid URL for the product image."],
+                    required : [true, "Product image is missing."]
                 },
                 quantity : {
                     type : Number,
@@ -82,13 +98,13 @@ const orderSchema = new mongoose.Schema({
         },
         paymentMethod : {
             type : String,
-            enum : ['credit_card', 'paypal', 'bank_transfer', "cash"],
+            enum : ['credit_card', 'paypal', "cash"],
             required : [true, "Payment method is missing. Please provide a payment method for the order."]
         },
         paymentIntentId : {
             type : String,
             required : [
-                function (this: any) { return this.orderType === 'online'; },
+                function (this: any) { return this.paymentMethod === 'credit_card'; },
                 "Payment intent ID is missing. Please provide a payment intent ID for the order."
             ]
         }

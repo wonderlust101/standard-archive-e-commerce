@@ -73,10 +73,7 @@ export const addToCartValidation = z.object({
         .trim()
         .min(1, {error : "Please select a color to continue."})
         .max(50, {error : "Color must be under 50 characters."}),
-    size : z.string({error : "Size must be provided in text format."})
-        .trim()
-        .min(1, {error : "Please select a size to continue."})
-        .max(20, {error : "Size must be under 20 characters."})
+    size : z.enum(["XXS", "XS", "S", "M", "L", "XL", "XXL"], {error : "Please select a valid size."})
 });
 
 export const updateCartValidation = addToCartValidation.partial();

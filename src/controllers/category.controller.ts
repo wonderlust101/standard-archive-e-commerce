@@ -1,6 +1,6 @@
 import { RequestHandler } from "express";
 import { APIRequest } from "../@types/APIRequest";
-import { CategoryRaw } from "../models/Category";
+import { CategoryRaw } from "../models/Category.model";
 import CategoryService, { CategoryTreeNode } from "../services/category.service";
 import { CategorySlug, CreateCategorySchema, UpdateCategorySchema } from "../validation/category.validation";
 import { ObjectIdSchema } from "../validation/common/objectID.validation";
