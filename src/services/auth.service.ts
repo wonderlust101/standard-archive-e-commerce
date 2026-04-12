@@ -5,8 +5,6 @@ import { ConflictError } from "../errors/ConflictError";
 import * as crypto from "node:crypto";
 import { LoginValidation, RegisterValidation } from "../validation/auth.validation";
 
-// TODO: Replace any with zod schema
-
 if (!process.env.JWT_SECRET)
     throw new Error("JWT_SECRET is not defined in your environment variables. Please check your .env file.");
 

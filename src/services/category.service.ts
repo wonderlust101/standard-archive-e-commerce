@@ -49,8 +49,8 @@ export default class CategoryService {
         return tree;
     }
 
-    public async getCategoryByID(id: string) {
-        const category = await Category.findById(id);
+    public async getCategoryByID(categoryID: string) {
+        const category = await Category.findById(categoryID);
 
         if (!category)
             throw new NotFoundError("Unable to find category. Please check the ID and try again.");
@@ -71,8 +71,8 @@ export default class CategoryService {
         return await Category.create(createCategoryDTO);
     }
 
-    public async updateCategory(id: string, updateCategoryDTO: UpdateCategorySchema) {
-        const category = await Category.findById(id);
+    public async updateCategory(categoryID: string, updateCategoryDTO: UpdateCategorySchema) {
+        const category = await Category.findById(categoryID);
 
         if (!category)
             throw new NotFoundError("Unable to find category. Please check the ID and try again.");
@@ -82,8 +82,8 @@ export default class CategoryService {
         return await category.save();
     }
 
-    public async deleteCategory(id: string) {
-        const deletedCategory = await Category.findByIdAndDelete(id);
+    public async deleteCategory(categoryID: string) {
+        const deletedCategory = await Category.findByIdAndDelete(categoryID);
 
         if (!deletedCategory)
             throw new NotFoundError("Unable to find category. Please check the ID and try again.");

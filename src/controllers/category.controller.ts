@@ -10,13 +10,12 @@ const categoryService = new CategoryService();
 // ── STATIC GET ROUTES ─────────────────────────────────────────────────────────────
 
 // GET /api/categories
-// TODO: Add zod types
 export const getCategories: RequestHandler<{}, APIRequest<CategoryRaw[]>> = async (req, res) => {
     const categories = await categoryService.getAllCategories();
 
     return res.status(200).json({
         success : true,
-        message : "Collection categories retrieved successfully.",
+        message : "Categories retrieved successfully.",
         data : categories
     });
 };
@@ -27,7 +26,7 @@ export const getCategoryTree: RequestHandler<{}, APIRequest<CategoryTreeNode[]>>
 
     return res.status(200).json({
         success : true,
-        message : "Navigation structure generated.",
+        message : "Category hierarchy generated successfully.",
         data : categories
     });
 };
@@ -40,7 +39,7 @@ export const getCategory: RequestHandler<ObjectIdSchema, APIRequest<CategoryRaw>
 
     return res.status(200).json({
         success : true,
-        message : "Category details loaded.",
+        message : "Category details retrieved.",
         data : category
     });
 };
@@ -52,7 +51,7 @@ export const getCategoryBySlug: RequestHandler<CategorySlug, APIRequest<Category
 
     return res.status(200).json({
         success : true,
-        message : "Category details loaded.",
+        message : "Category found.",
         data : category
     });
 };
@@ -65,7 +64,7 @@ export const createCategory: RequestHandler<{}, APIRequest<CategoryRaw>, CreateC
 
     return res.status(201).json({
         success : true,
-        message : "Create a new category",
+        message : "Category created successfully.",
         data : newCategory
     });
 };
@@ -78,7 +77,7 @@ export const updateCategory: RequestHandler<ObjectIdSchema, APIRequest<CategoryR
 
     return res.status(200).json({
         success : true,
-        message : "Update an existing category",
+        message : "Category updated successfully.",
         data : updatedCategory
     });
 };
@@ -89,7 +88,7 @@ export const deleteCategory: RequestHandler<ObjectIdSchema, APIRequest<CategoryR
 
     return res.status(200).json({
         success : true,
-        message : "Delete/Archive a category",
+        message : "Category has been deleted.",
         data : deletedCategory
     });
 };

@@ -94,10 +94,14 @@ const userSchema = new Schema({
             type : PhoneSchema,
             default : null
         },
-        wishList : [{
-            type : Schema.Types.ObjectId,
-            ref : "Product"
-        }],
+        wishList : {
+            type : [{
+                type : Schema.Types.ObjectId,
+                ref : "Product",
+                required: [true, "Product ID is required. Please provide a valid Product ID."]
+            }],
+            default : []
+        },
         newsletterSubscription : {
             type : Boolean,
             default : true
@@ -108,42 +112,45 @@ const userSchema = new Schema({
             default : 'active'
         },
         // Cart
-        cart : [
-            {
-                productId : {
-                    type : Schema.Types.ObjectId,
-                    ref : "Product"
-                },
-                quantity : {
-                    type : Number,
-                    default : 1,
-                    min : [1, "Quantity must be at least 1."],
-                    max : [100, "The maximum quantity per item is 100."]
-                },
-                sku : {
-                    type : String,
-                    required : [true, "Product SKU is missing. Please provide a SKU for the product."],
-                    minlength : [10, "Product SKU must be at least 10 character long."],
-                    maxlength : [10, "Product SKU cannot be longer than 10 characters."],
-                    trim : true
-                },
-                color : {
-                    type : String,
-                    required : [true, "Product color is missing. Please provide a color for the product."],
-                    minlength : [1, "Product color code must be at least 3 characters long."],
-                    maxlength : [50, "Product color code cannot be longer than 50 characters."],
-                    trim : true
-                },
-                size : {
-                    type : String,
-                    required : [true, "Product size is missing. Please provide a size for the product."],
-                    enum : {
-                        values : ["XXS", "XS", "S", "M", "L", "XL", "XXL"],
-                        message : "{VALUE} is not a valid size option"
+        cart : {
+            type : [
+                {
+                    productId : {
+                        type : Schema.Types.ObjectId,
+                        ref : "Product"
+                    },
+                    quantity : {
+                        type : Number,
+                        default : 1,
+                        min : [1, "Quantity must be at least 1."],
+                        max : [100, "The maximum quantity per item is 100."]
+                    },
+                    sku : {
+                        type : String,
+                        required : [true, "Product SKU is missing. Please provide a SKU for the product."],
+                        minlength : [10, "Product SKU must be at least 10 character long."],
+                        maxlength : [10, "Product SKU cannot be longer than 10 characters."],
+                        trim : true
+                    },
+                    color : {
+                        type : String,
+                        required : [true, "Product color is missing. Please provide a color for the product."],
+                        minlength : [1, "Product color code must be at least 3 characters long."],
+                        maxlength : [50, "Product color code cannot be longer than 50 characters."],
+                        trim : true
+                    },
+                    size : {
+                        type : String,
+                        required : [true, "Product size is missing. Please provide a size for the product."],
+                        enum : {
+                            values : ["XXS", "XS", "S", "M", "L", "XL", "XXL"],
+                            message : "{VALUE} is not a valid size option"
+                        }
                     }
                 }
-            }
-        ]
+            ],
+            default : []
+        }
     },
     {
         timestamps : true,
@@ -183,5 +190,7 @@ userSchema.pre('save', async function () {
 
 export type UserRaw = InferSchemaType<typeof userSchema>;
 export type UserDocument = HydratedDocument<UserRaw & UserMethods & UserVirtuals>;
+export type UserCart = UserRaw['cart'];
+export type CartItem = UserCart[number];
 
 export default mongoose.model<UserDocument>('User', userSchema);

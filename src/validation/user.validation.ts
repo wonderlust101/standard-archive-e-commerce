@@ -76,4 +76,17 @@ export const addToCartValidation = z.object({
     size : z.enum(["XXS", "XS", "S", "M", "L", "XL", "XXL"], {error : "Please select a valid size."})
 });
 
-export const updateCartValidation = addToCartValidation.partial();
+export const updateCartValidation = addToCartValidation.partial().extend({
+    quantity : z.number({error : "Quantity must be a valid number."})
+        .int({error : "Quantity must be a whole number."})
+        .positive({error : "Quantity must be at least 1."})
+        .max(100, {error : "The maximum quantity per item is 100."})
+        .default(1)
+});
+
+export const deleteCartValidation = addToCartValidation.partial();
+
+export type UpdateProfileSchema = z.infer<typeof updateProfileValidation>;
+export type UpdateUserSchema = z.infer<typeof updateUserValidation>;
+export type AddToCartSchema = z.infer<typeof addToCartValidation>;
+export type UpdateCartSchema = z.infer<typeof updateCartValidation>;
