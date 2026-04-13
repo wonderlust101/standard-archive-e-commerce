@@ -17,7 +17,6 @@ export class OrderService {
         if (!order)
             throw new NotFoundError("Unable to find order. Please check the ID and try again.");
 
-
         return order;
     }
 

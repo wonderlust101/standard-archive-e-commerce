@@ -2,6 +2,11 @@ import { bsonType } from 'bson';
 import mongoose, { HydratedDocument, InferSchemaType, Schema } from "mongoose";
 import slugify from "slugify";
 
+type ProductVirtuals = {
+    totalStock : number,
+    isInStock : boolean
+}
+
 const productSchema = new Schema({
         // General
         name : {
@@ -214,6 +219,6 @@ productSchema.pre("save", function () {
 });
 
 export type ProductRaw = InferSchemaType<typeof productSchema>;
-export type ProductDocument = HydratedDocument<ProductRaw>;
+export type ProductDocument = HydratedDocument<ProductRaw & ProductVirtuals>;
 
 export default mongoose.model<ProductDocument>('Product', productSchema);
