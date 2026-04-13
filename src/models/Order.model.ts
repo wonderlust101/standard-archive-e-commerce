@@ -1,6 +1,7 @@
 import { bsonType } from 'bson';
 import mongoose, { HydratedDocument, InferSchemaType, Schema } from "mongoose";
 import { addressSchema } from "./common/Address.schema";
+import OrderCounter from "./common/OrderCounter.model";
 
 const orderSchema = new mongoose.Schema({
         userId : {
@@ -11,9 +12,11 @@ const orderSchema = new mongoose.Schema({
         orderNumber : {
             type : String,
             unique : true,
+            sparse : true,
             minlength : [10, "Order number must be at least 10 characters long."],
             maxlength : [10, "Order number cannot exceed 10 characters."],
-            match : [/^[a-zA-Z0-9\-]+$/, "Order numbers may only contain letters, numbers, and hyphens."]
+            match : [/^[a-zA-Z0-9\-]+$/, "Order numbers may only contain letters, numbers, and hyphens."],
+            default : null
         },
         orderType : {
             type : String,
@@ -26,7 +29,8 @@ const orderSchema = new mongoose.Schema({
                 "Store number is missing. Please provide a store number for the order."],
             minlength : [10, "Store number must be at least 10 characters long."],
             maxlength : [10, "Store number cannot exceed 10 characters."],
-            match : [/^[a-zA-Z0-9\-]+$/, "Store numbers may only contain letters, numbers, or hyphens."]
+            match : [/^[a-zA-Z0-9\-]+$/, "Store numbers may only contain letters, numbers, or hyphens."],
+            default : null
         },
         products : [
             {
@@ -134,14 +138,23 @@ orderSchema.virtual("totalItems").get(function () {
 });
 
 // Pre-save hook
-orderSchema.pre("save", function () {
-    if (this.isNew) {
-        const randomString = Math.random().toString(36).substring(2, 8).toUpperCase();
-        this.orderNumber = `UNQ-${randomString}`;
+orderSchema.pre("save", async function () {
+    if (this.isNew && !this.orderNumber && this.orderType === 'online') {
+        const orderCounter = await OrderCounter.findOneAndUpdate(
+            {name : 'orderNumber'},
+            {$inc : {seq : 1}},
+            {upsert : true, returnDocument : "after"}
+        );
+
+        let alphanumericID = orderCounter.seq.toString(36).toUpperCase();
+        const paddedID = alphanumericID.padStart(10, '0');
+
+        this.orderNumber = `STA-${paddedID}`;
     }
 
     return;
 });
+
 
 // Pre-validate hook
 orderSchema.pre("validate", function () {

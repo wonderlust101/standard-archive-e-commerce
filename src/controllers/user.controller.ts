@@ -5,7 +5,6 @@ import { UserCart, UserRaw } from "../models/User.model";
 import { ObjectIdSchema } from "../validation/common/objectID.validation";
 import { AddToCartSchema, UpdateUserSchema, UpdateCartSchema, UpdateProfileSchema } from "../validation/user.validation";
 import { ProductIDSchema } from "../validation/product.validation";
-import { BadRequestError } from "../errors/BadRequestError";
 
 const userService = new UserService();
 

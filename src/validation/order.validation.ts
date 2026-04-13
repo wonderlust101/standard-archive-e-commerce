@@ -16,7 +16,8 @@ export const createOrderSchema = z.object({
         .trim()
         .length(10, {error : "Store numbers must be exactly 10 characters for in-store orders."})
         .regex(/^[a-zA-Z0-9\-]+$/, {error : "Store numbers may only contain letters, numbers, or hyphens."})
-        .optional(),
+        .nullable()
+        .default(null),
     products : z.array(z.object({
         productId : z.string({error : "Product ID must be provided in text format."})
             .length(24, {error : "The archive uses 24-character identifiers. Please check the Product ID."})
